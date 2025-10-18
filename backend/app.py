@@ -7,7 +7,10 @@ from main import DanceScheduler
 
 app = FastAPI()
 
-
+origins = [
+    "http://localhost:5173",   # local dev
+    "https://danceassignment.netlify.app",  # replace with your actual Netlify URL
+]
 @app.get('/')
 async def root():
     return {"ok": True, "message": "Backend is running"}
