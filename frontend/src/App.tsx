@@ -20,7 +20,7 @@ function App() {
 
       setLoading(true);
       try{
-        const url = "https://dance-assignments.onrender.com/generate";
+        const url = "http://localhost:8000/generate";
         console.log("Posting to", url);
         const res = await axios.post(url, formData);
         setResult(res.data);
