@@ -5,6 +5,8 @@ import pandas as pd
 import traceback
 from main import DanceScheduler
 import logging
+import io
+import contextlib
 
 app = FastAPI()
 
@@ -71,15 +73,34 @@ async def generate_configs(
         if not configs:
             return {"message": "No configurations generated."}
 
-        # Calculate satisfaction for each config and return best
+        # Calculate satisfaction for each config, capture the human-readable report text,
+        # and return structured data + the report text so the frontend can display it.
         results = []
-        for cfg in configs:
+        for i, cfg in enumerate(configs, start=1):
             score = scheduler._calculate_satisfaction(cfg)
-            results.append({"satisfaction": score, "assignments": cfg})
 
-        # Sort and return best
+            # Capture printed report from scheduler.print_configuration into a string
+            buf = io.StringIO()
+            try:
+                with contextlib.redirect_stdout(buf):
+                    # provide config number so the printed output matches what was previously shown
+                    scheduler.print_configuration(cfg, config_num=i)
+            except Exception:
+                # If something goes wrong capturing prints, include an error message in report_text
+                buf.write("(Failed to generate report_text)\n")
+                buf.write(traceback.format_exc())
+
+            report_text = buf.getvalue()
+
+            results.append({
+                "satisfaction": score,
+                "assignments": cfg,
+                "report_text": report_text
+            })
+
+        # Sort and return results by satisfaction (best first)
         results.sort(key=lambda r: r["satisfaction"], reverse=True)
-        return results[0]
+        return results
     except Exception as e:
         print(f"Error processing request: {str(e)}")
         print(f"Traceback: {traceback.format_exc()}")

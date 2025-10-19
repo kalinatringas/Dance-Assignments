@@ -1,5 +1,8 @@
 import random
 import csv  
+import io
+import sys
+from contextlib import redirect_stdout
 import pandas as pd
 from typing import List, Dict, Set, Tuple
 from collections import defaultdict
@@ -179,7 +182,10 @@ class DanceScheduler:
             if set(c1[dancer]) != set(c2[dancer]):
                 return False
         return True
+
+        
     def print_configuration(self, config: Dict[str, List[str]], config_num: int = None):
+        
         if config_num is not None:
             print(f"\n{'='*50}")
             print(f"Configuration {config_num}")
@@ -254,7 +260,9 @@ class DanceScheduler:
                     print(f"   {status_symbol} {dance}: {count}/{capacity} [{status}]")
                 else:
                     print(f"   {dance}: {count}/{capacity}")
-                    
+
+
+
 if __name__ == "__main__":
     dancers = 'dances.csv'
 
