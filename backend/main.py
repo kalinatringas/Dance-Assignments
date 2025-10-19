@@ -4,7 +4,7 @@ import io
 import sys
 from contextlib import redirect_stdout
 import pandas as pd
-from typing import List, Dict, Set, Tuple
+from typing import List, Dict
 from collections import defaultdict
 
 class DanceScheduler:
@@ -72,7 +72,7 @@ class DanceScheduler:
         return dances
 
     def _calculate_satisfaction(self, assignment: Dict[str, List[str]]) -> float:
-        """Calculate how well an assignment satisfies preferences."""
+        #Calculate how well an assignment satisfies preferences.
         total_score = 0
         for dancer, dances in assignment.items():
             ranked = self.dancers[dancer]['ranked choices']
@@ -192,17 +192,17 @@ class DanceScheduler:
             print(f"Satisfaction Score: {self._calculate_satisfaction(config):.1f}")
             print(f"{'='*50}")
         
-        # Print constraint violations
+        #print constraint violations
         print("\nConstraint Status:")
         violations = []
         
-        # Check dancer count constraints
+        # check dancer count constraints
         for dancer, dances in config.items():
             desired = self.dancers[dancer]["desired count"]
             if len(dances) != desired:
                 violations.append(f"! {dancer} has {len(dances)} dances but wanted {desired}")
         
-        # Check dance capacity constraints
+        # check dance capacity constraints
         if self.dance_capacities:
             dance_counts = defaultdict(int)
             for dances in config.values():
@@ -260,6 +260,84 @@ class DanceScheduler:
                     print(f"   {status_symbol} {dance}: {count}/{capacity} [{status}]")
                 else:
                     print(f"   {dance}: {count}/{capacity}")
+
+
+    def configuration_report(self, config: Dict[str, List[str]], config_num: int = None) -> str:
+        """Return the same human-readable report as `print_configuration`, but as a string."""
+        lines = []
+        def w(s=""):
+            lines.append(str(s))
+
+        if config_num is not None:
+            w('\n' + '='*50)
+            w(f"Configuration {config_num}")
+            w(f"Satisfaction Score: {self._calculate_satisfaction(config):.1f}")
+            w('='*50)
+
+        # Constraint status
+        w('\nConstraint Status:')
+        violations = []
+
+        for dancer, dances in config.items():
+            desired = self.dancers[dancer]["desired count"]
+            if len(dances) != desired:
+                violations.append(f"! {dancer} has {len(dances)} dances but wanted {desired}")
+
+        if self.dance_capacities:
+            dance_counts = defaultdict(int)
+            for dances in config.values():
+                for dance in dances:
+                    dance_counts[dance] += 1
+
+            for dance, count in dance_counts.items():
+                if dance in self.dance_capacities and count > self.dance_capacities[dance]:
+                    violations.append(f"! {dance} has {count} dancers but capacity is {self.dance_capacities[dance]}")
+
+        if violations:
+            w('Issues found:')
+            for v in violations:
+                w(v)
+        else:
+            w('* All constraints satisfied')
+
+        # Organize dancers by dance
+        dance_to_dancers = defaultdict(list)
+        for dancer, dances in config.items():
+            for dance in dances:
+                rank = self.dancers[dancer]["ranked choices"].index(dance) + 1 if dance in self.dancers[dancer]["ranked choices"] else 0
+                dance_to_dancers[dance].append((dancer, rank))
+
+        w('\nDance Assignments:')
+        for dance in sorted(self.all_dances):
+            if dance in dance_to_dancers:
+                dancers_in_dance = dance_to_dancers[dance]
+                capacity = self.dance_capacities.get(dance, "No limit")
+                w(f"\n{dance} ({len(dancers_in_dance)} dancers, capacity: {capacity}):")
+                dancers_in_dance.sort(key=lambda x: (x[1] if x[1] > 0 else float('inf')))
+                for dancer, rank in dancers_in_dance:
+                    if rank > 0:
+                        w(f"  * {dancer} (Choice #{rank})")
+                    else:
+                        w(f"  - {dancer} (Not in preferences)")
+
+        if self.dance_capacities:
+            w('\n' + '-'*50)
+            w('Dance Capacity Usage:')
+            dance_counts = defaultdict(int)
+            for dances in config.values():
+                for dance in dances:
+                    dance_counts[dance] += 1
+            for dance in sorted(self.all_dances):
+                count = dance_counts[dance]
+                capacity = self.dance_capacities.get(dance, "No limit")
+                if isinstance(capacity, int):
+                    status = "OVER CAPACITY" if count > capacity else "FULL" if count == capacity else "OK"
+                    status_symbol = "!" if count > capacity else "*"
+                    w(f"   {status_symbol} {dance}: {count}/{capacity} [{status}]")
+                else:
+                    w(f"   {dance}: {count}/{capacity}")
+
+        return "\n".join(lines)
 
 
 

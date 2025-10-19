@@ -91,7 +91,25 @@ function App() {
               return (
                 <div>
                   <h2 className="text-xl font-semibold">Satisfaction Score: {best.satisfaction}</h2>
-                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(best.assignments, null, 2)}</pre>
+                  {best.assignments_by_dance ? (
+                    <div>
+                      <h3 className="text-lg font-medium mt-2">Assignments by Dance</h3>
+                      <div className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">
+                        {Object.keys(best.assignments_by_dance).sort().map((dance) => (
+                          <div key={dance} className="mb-2">
+                            <strong>{dance}</strong>
+                            <ul className="list-disc list-inside">
+                              {best.assignments_by_dance[dance].map((d: string) => (
+                                <li key={d}>{d}</li>
+                              ))}
+                            </ul>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(best.assignments, null, 2)}</pre>
+                  )}
                   <h3 className="text-lg font-medium mt-4">Report</h3>
                   <pre className="bg-black text-white p-4 rounded text-left mt-2 w-[100vw] whitespace-pre-wrap">{best.report_text}</pre>
                 </div>

@@ -79,22 +79,27 @@ async def generate_configs(
         for i, cfg in enumerate(configs, start=1):
             score = scheduler._calculate_satisfaction(cfg)
 
-            # Capture printed report from scheduler.print_configuration into a string
-            buf = io.StringIO()
+            # Get a human-readable report string directly from scheduler
             try:
-                with contextlib.redirect_stdout(buf):
-                    # provide config number so the printed output matches what was previously shown
-                    scheduler.print_configuration(cfg, config_num=i)
+                report_text = scheduler.configuration_report(cfg, config_num=i)
             except Exception:
-                # If something goes wrong capturing prints, include an error message in report_text
-                buf.write("(Failed to generate report_text)\n")
-                buf.write(traceback.format_exc())
+                report_text = "(Failed to generate report_text)\n" + traceback.format_exc()
 
-            report_text = buf.getvalue()
+            # Build dance -> [dancers] mapping for easier display on frontend
+            dance_map = {}
+            from collections import defaultdict as _dd
+            tmp = _dd(list)
+            for dancer, dances in cfg.items():
+                for dance in dances:
+                    tmp[dance].append(dancer)
+            # sort dancer lists for determinism
+            for k in tmp:
+                tmp[k] = sorted(tmp[k])
 
             results.append({
                 "satisfaction": score,
-                "assignments": cfg,
+                "assignments": cfg,  # dancer -> [dances], kept for compatibility
+                "assignments_by_dance": dict(tmp),
                 "report_text": report_text
             })
 
