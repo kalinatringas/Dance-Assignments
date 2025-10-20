@@ -88,7 +88,7 @@ function App() {
           {result.configs && result.configs.length > 0 ? (
             result.configs.map((cfg: any, idx: number) => (
               <div key={idx} className="mb-8">
-                <h2 className="text-xl font-semibold">Configuration {idx + 1} — Satisfaction Score: {cfg.satisfaction}</h2>
+                <h2 className="text-xl font-semibold">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
                 <h3 className='text-l font-semibold'>Violations: {cfg.violations}</h3>
                 {cfg.assignments_by_dance ? (
                   <div>

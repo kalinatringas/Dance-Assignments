@@ -79,7 +79,7 @@ async def generate_configs(
         for i, cfg in enumerate(configs, start=1):
             score = scheduler._calculate_satisfaction(cfg)
 
-            violations = scheduler._return_violations(cfg)
+            violations = scheduler._return_violations(cfg, config_num=i)
 
             # Get a human-readable report string directly from scheduler
             try:

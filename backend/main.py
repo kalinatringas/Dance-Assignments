@@ -173,12 +173,12 @@ class DanceScheduler:
         configs.sort(key=lambda c: self._calculate_satisfaction(c), reverse=True) #list by best configurations
 
         return configs
-    def _return_violations(self, config: Dict[str, List[str]], config_num: int =None) ->List[str] :
-        violations = []
+    def _return_violations(self, config: Dict[str, List[str]], config_num: int =None) -> str :
+        violations = ''
         for dancer, dances in config.items():
             desired = self.dancers[dances]["desired count"]
             if len(dances) != desired:
-                violations.append(f"! {dancer} has {len(dances)} dances but wanted {desired}")
+                violations+=(f"\n! {dancer} has {len(dances)} dances but wanted {desired}")
             
         if self.dance_capacities:
             dance_counts = defaultdict(int)
@@ -189,7 +189,7 @@ class DanceScheduler:
             for dance, count in dance_counts.items():
                 if dance in self.dance_capacities:
                     if count > self.dance_capacities[dance]:
-                        violations.append(f"! {dance} has {count} dancers but capacity is {self.dance_capacities[dance]}")
+                        violations+=(f"\n! {dance} has {count} dancers but capacity is {self.dance_capacities[dance]}")
         
         return violations
 
