@@ -79,6 +79,8 @@ async def generate_configs(
         for i, cfg in enumerate(configs, start=1):
             score = scheduler._calculate_satisfaction(cfg)
 
+            violations = scheduler._return_violations(cfg)
+
             # Get a human-readable report string directly from scheduler
             try:
                 report_text = scheduler.configuration_report(cfg, config_num=i)
@@ -95,11 +97,12 @@ async def generate_configs(
             # sort dancer lists for determinism
             for k in tmp:
                 tmp[k] = sorted(tmp[k])
-
+            #what i need is something that captures violations and returns 
             results.append({
                 "satisfaction": score,
                 "assignments": cfg,  # dancer -> [dances], kept for compatibility
                 "assignments_by_dance": dict(tmp),
+                "violations" : violations,
                 "report_text": report_text
             })
 

@@ -173,7 +173,26 @@ class DanceScheduler:
         configs.sort(key=lambda c: self._calculate_satisfaction(c), reverse=True) #list by best configurations
 
         return configs
-    
+    def _return_violations(self, config: Dict[str, List[str]], config_num: int =None) ->List[str] :
+        violations = []
+        for dancer, dances in config.items():
+            desired = self.dancers[dances]["desired count"]
+            if len(dances) != desired:
+                violations.append(f"! {dancer} has {len(dances)} dances but wanted {desired}")
+            
+        if self.dance_capacities:
+            dance_counts = defaultdict(int)
+            for dances in config.values():
+                for dance in dances:
+                    dance_counts[dance] += 1
+            
+            for dance, count in dance_counts.items():
+                if dance in self.dance_capacities:
+                    if count > self.dance_capacities[dance]:
+                        violations.append(f"! {dance} has {count} dancers but capacity is {self.dance_capacities[dance]}")
+        
+        return violations
+
     def _configs_equal(self, c1: Dict[str, List[str]], c2: Dict[str, List[str]]) -> bool:
         # checks to see if two configs are equal
         if set(c1.keys())!= set(c2.keys()): #checks to see if both configs have the same dancers
@@ -194,7 +213,7 @@ class DanceScheduler:
         
         #print constraint violations
         print("\nConstraint Status:")
-        violations = []
+        violations = [] #could I return violations as a member of the class or 
         
         # check dancer count constraints
         for dancer, dances in config.items():
@@ -345,8 +364,8 @@ if __name__ == "__main__":
     dancers = 'dances.csv'
 
     scheduler = DanceScheduler.from_csv('input.csv', 'dances.csv')
-
     configs = scheduler.generate_configurations(n=5)
+    violations = scheduler._return_violations(configs)
 
     for i, config in enumerate(configs, 1):
         scheduler.print_configuration(config, config_num=i)
