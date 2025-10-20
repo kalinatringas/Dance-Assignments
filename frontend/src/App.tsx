@@ -23,7 +23,19 @@ function App() {
         const url = "https://dance-assignments.onrender.com/generate";
         console.log("Posting to", url);
         const res = await axios.post(url, formData);
-        setResult(res.data);
+
+        // The backend returns an array of configs (sorted best-first) or an object with message.
+        // Normalize into a predictable structure for the UI.
+        let payload = res.data;
+        if (Array.isArray(payload)) {
+          // Keep as-is; frontend will show the best (first) and allow viewing others if needed
+          setResult({ configs: payload });
+        } else if (payload.configs) {
+          setResult(payload);
+        } else {
+          // single object response (maybe {message: ...})
+          setResult(payload);
+        }
       }catch(err:any){
         console.error("Axios error:", err);
         if (err.response){
@@ -69,15 +81,52 @@ function App() {
       >
         {loading ? "Generating..." : "Generate"}
       </button>
-
+        
       {result && (
-        <div className="mt-6">
-          <h2 className="text-xl font-semibold">
-            Satisfaction Score: {result.satisfaction}
-          </h2>
-          <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">
-            {JSON.stringify(result.assignments, null, 2)}
-          </pre>
+        <div className="mt-6 text-left">
+          {/* If multiple configs are returned, render each one */}
+          {result.configs && result.configs.length > 0 ? (
+            result.configs.map((cfg: any, idx: number) => (
+              <div key={idx} className="mb-8">
+                <h2 className="text-xl font-semibold">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
+                <h3 className='text-l font-semibold'>Violations: {cfg.violations}</h3>
+                {cfg.assignments_by_dance ? (
+                  <div>
+                    <h3 className="text-lg font-medium mt-2">Assignments by Dance</h3>
+                    <div className="bg-gray-100 p-4 rounded text-left mt-2 ">
+                      {Object.keys(cfg.assignments_by_dance).sort().map((dance) => (
+                        <div key={dance} className="mb-2">
+                          <strong>{dance}</strong>
+                          <ul className="list-disc ml-4">
+                            {cfg.assignments_by_dance[dance].map((d: string) => (
+                              <li className="text-left " key={d}>{d}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(cfg.assignments, null, 2)}</pre>
+                )}
+
+                <h3 className="text-lg font-medium mt-4">Report</h3>
+                <pre className="bg-black text-white p-4 rounded text-left mt-2 w-[100vw] whitespace-pre-wrap">{cfg.report_text}</pre>
+              </div>
+            ))
+          ) : result.satisfaction ? (
+            // single-result object with satisfaction
+            <div>
+              <h2 className="text-xl font-semibold">Satisfaction Score: {result.satisfaction}</h2>
+              <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(result.assignments, null, 2)}</pre>
+              <h3 className="text-lg font-medium mt-4">Report</h3>
+              <pre className="bg-black text-white p-4 rounded text-left mt-2 w-[100vw] whitespace-pre-wrap">{result.report_text}</pre>
+            </div>
+          ) : (
+            // fallback: show raw response
+            <div></div>
+           // <pre className="bg-red-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(result, null, 2)}</pre>
+          )}
         </div>
       )}
     </div>

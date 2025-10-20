@@ -5,6 +5,8 @@ import pandas as pd
 import traceback
 from main import DanceScheduler
 import logging
+import io
+import contextlib
 
 app = FastAPI()
 
@@ -71,15 +73,42 @@ async def generate_configs(
         if not configs:
             return {"message": "No configurations generated."}
 
-        # Calculate satisfaction for each config and return best
+        # Calculate satisfaction for each config, capture the human-readable report text,
+        # and return structured data + the report text so the frontend can display it.
         results = []
-        for cfg in configs:
+        for i, cfg in enumerate(configs, start=1):
             score = scheduler._calculate_satisfaction(cfg)
-            results.append({"satisfaction": score, "assignments": cfg})
 
-        # Sort and return best
+            violations = scheduler._return_violations(cfg, config_num=i)
+
+            # Get a human-readable report string directly from scheduler
+            try:
+                report_text = scheduler.configuration_report(cfg, config_num=i)
+            except Exception:
+                report_text = "(Failed to generate report_text)\n" + traceback.format_exc()
+
+            # Build dance -> [dancers] mapping for easier display on frontend
+            dance_map = {}
+            from collections import defaultdict as _dd
+            tmp = _dd(list)
+            for dancer, dances in cfg.items():
+                for dance in dances:
+                    tmp[dance].append(dancer)
+            # sort dancer lists for determinism
+            for k in tmp:
+                tmp[k] = sorted(tmp[k])
+            #what i need is something that captures violations and returns 
+            results.append({
+                "satisfaction": score,
+                "assignments": cfg,  # dancer -> [dances], kept for compatibility
+                "assignments_by_dance": dict(tmp),
+                "violations" : violations,
+                "report_text": report_text
+            })
+
+        # Sort and return results by satisfaction (best first)
         results.sort(key=lambda r: r["satisfaction"], reverse=True)
-        return results[0]
+        return results
     except Exception as e:
         print(f"Error processing request: {str(e)}")
         print(f"Traceback: {traceback.format_exc()}")
