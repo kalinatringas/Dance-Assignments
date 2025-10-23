@@ -1,7 +1,16 @@
 import { useState } from 'react'
-import { Upload } from 'lucide-react';
 import { UploadSection } from './ui/UploadSection';
 import axios from 'axios'
+import { Card, CardContent } from "@/components/ui/card"
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel"
+
+//import 'bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 
 function App() {
@@ -49,12 +58,10 @@ function App() {
         setLoading(false);
       }
   };
-
-
-
   return (
     <>
-     <div className="min-w-[90%] max-w-screen text-black/80 overflow-hidden p-10 text-center"> 
+    
+    <div className="min-w-[90%] max-w-screen text-black/80 p-10 text-center"> 
       <h1 className="text-2xl font-bold m-auto justify-around pb-3 mb-0.5 font-motley">Dance Scheduler</h1>
       
       <div className='grid grid-cols-2 gap-4 mx-auto mb-8 max-w-4xl'>
@@ -86,42 +93,46 @@ function App() {
       {result && (
         <div className="mt-6 text-left">
           {/* If multiple configs are returned, render each one */}
+          <Carousel>
+          <CarouselContent>
           {result.configs && result.configs.length > 0 ? (
             result.configs.map((cfg: any, idx: number) => (
-              <div key={idx} className="mb-8">
+              <CarouselItem key={idx} className="mb-8 m-auto text-center w-full">
+                <Card>
                 <h2 className="text-xl font-semibold">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
-                <h3 className='text-m font-semibold'>Violations: {cfg.violations}</h3>
-                
+                <h3 className='text-m font-semibold'>Violations: {cfg.violations}</h3>                
                 {cfg.assignments_by_dance ? (
                   <div>
-                    <h3 className="text-lg font-medium mt-2">Assignments by Dance</h3>
-                    <div className="bg-pink-100 p-4 rounded text-left mt-2 ">
+                    <h3 className="text-lg font-medium mt-2 m-auto">Assignments by Dance</h3>
+                    <div className='grid grid-flow-col'>
                       {Object.keys(cfg.assignments_by_dance).sort().map((dance) => (
-                        <div key={dance} className="mb-2">
+                        <div key={dance} className="m-auto text-center bg-purple-100/80 p-4 rounded-xl max-w-fit mt-2">
+                       
                           <strong className='text-m'>{dance}</strong>
+                          <div>---------------</div>
                           <div/>
-                          <div className="m-auto w-[50%] pink">
+                          <div className="m-auto pink text-center">
                             {cfg.assignments_by_dance[dance].map((d: string) => (
-                              <div className="text-left " key={d}>{d}</div>
+                              <div className="text-center m-auto " key={d}>{d}</div>
                             ))}
                           </div>
                         </div>
                       ))}
                     </div>
                   </div>
+                 
                 ) : (
-                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(cfg.assignments, null, 2)}</pre>
+                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-screen">{JSON.stringify(cfg.assignments, null, 2)}</pre>
                 )}
-
-                <h3 className="text-lg font-medium mt-4">Report</h3>
-                {/*<pre className="bg-black text-white p-4 rounded text-left mt-2 w-[100vw] whitespace-pre-wrap">{cfg.report_text}</pre>*/}              </div>
+                </Card> 
+                </CarouselItem> 
+                    
             ))
           ) : result.satisfaction ? (
             // single-result object with satisfaction
             <div>
               <h2 className="text-xl font-semibold">Satisfaction Score: {result.satisfaction}</h2>
               <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-screen">{JSON.stringify(result.assignments, null, 2)}</pre>
-              <h3 className="text-lg font-medium mt-4">Report</h3>
               <pre className="bg-black text-white p-4 rounded text-left mt-2 w-screen whitespace-pre-wrap">{result.report_text}</pre>
             </div>
           ) : (
@@ -129,6 +140,8 @@ function App() {
             <div></div>
            // <pre className="bg-red-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(result, null, 2)}</pre>
           )}
+          </CarouselContent>   
+          </Carousel>
         </div>
       )}
     </div>
