@@ -176,7 +176,7 @@ class DanceScheduler:
     def _return_violations(self, config: Dict[str, List[str]], config_num: int = None) -> str :
         violations = ''
         for dancer, dances in config.items():
-            desired = self.dancers[dances]["desired count"]
+            desired = self.dancers[dancer]["desired count"]
             if len(dances) != desired:
                 violations+=(f"\n! {dancer} has {len(dances)} dances but wanted {desired}")
             

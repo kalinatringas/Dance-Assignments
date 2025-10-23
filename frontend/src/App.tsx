@@ -23,12 +23,9 @@ function App() {
 
       setLoading(true);
       try{
-        const url = "https://dance-assignments.onrender.com/generate";
+        const url = "http://localhost:8000/generate";
         console.log("Posting to", url);
         const res = await axios.post(url, formData);
-
-        // The backend returns an array of configs (sorted best-first) or an object with message.
-        // Normalize into a predictable structure for the UI.
         let payload = res.data;
         if (Array.isArray(payload)) {
           // Keep as-is; frontend will show the best (first) and allow viewing others if needed
@@ -94,10 +91,11 @@ function App() {
               <div key={idx} className="mb-8">
                 <h2 className="text-xl font-semibold">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
                 <h3 className='text-m font-semibold'>Violations: {cfg.violations}</h3>
+                
                 {cfg.assignments_by_dance ? (
                   <div>
                     <h3 className="text-lg font-medium mt-2">Assignments by Dance</h3>
-                    <div className="bg-gray-100 p-4 rounded text-left mt-2 ">
+                    <div className="bg-pink-100 p-4 rounded text-left mt-2 ">
                       {Object.keys(cfg.assignments_by_dance).sort().map((dance) => (
                         <div key={dance} className="mb-2">
                           <strong className='text-m'>{dance}</strong>
@@ -112,7 +110,7 @@ function App() {
                     </div>
                   </div>
                 ) : (
-                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-screen">{JSON.stringify(cfg.assignments, null, 2)}</pre>
+                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(cfg.assignments, null, 2)}</pre>
                 )}
 
                 <h3 className="text-lg font-medium mt-4">Report</h3>
