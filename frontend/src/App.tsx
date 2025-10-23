@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { Upload } from 'lucide-react';
+import { UploadSection } from './ui/UploadSection';
 import axios from 'axios'
 import './App.css'
 
@@ -7,6 +9,7 @@ function App() {
   const [dancesFile, setDancesFile] = useState<File | null>(null);
   const [result, setResult] = useState<any | null>(null);
   const [loading, setLoading] = useState(false);
+
 
   const handleSubmit= async() =>{
     if (!dancersFile || !dancesFile){
@@ -54,26 +57,27 @@ function App() {
 
   return (
     <>
-     <div className="p-10 text-center">
-      <h1 className="text-2xl font-bold mb-4">Dance Scheduler</h1>
-
-      <input
-        type="file"
-        accept=".csv"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          const f = e.target.files && e.target.files[0] ? e.target.files[0] : null;
-          setDancersFile(f);
-        }}
-      />
-      <input
-        type="file"
-        accept=".csv"
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-          const f = e.target.files && e.target.files[0] ? e.target.files[0] : null;
-          setDancesFile(f);
-        }}
-        className="ml-2"
-      />
+     <div className="min-w-[90%] max-w-screen text-black/80 overflow-hidden p-10 text-center"> 
+      <h1 className="text-2xl font-bold m-auto justify-around pb-3 mb-0.5 font-motley">Dance Scheduler</h1>
+      
+      <div className='grid grid-cols-2 gap-4 mx-auto mb-8 max-w-4xl'>
+        <UploadSection
+          title= 'Dance Choices'
+          description='Upload a csv of the dancers ranked choices'
+          file = {dancersFile}
+          onFileChange={setDancersFile}
+          color='blue'
+          icon = '💃'
+        />
+        <UploadSection
+          title = 'Dances'
+          description='Upload a csv of the dances, and their spots'
+          file = {dancesFile}
+          onFileChange={setDancesFile}
+          color = 'purple'
+          icon = '😼'
+        />
+      </div>
       <button
         onClick={handleSubmit}
         disabled={loading}
@@ -89,38 +93,38 @@ function App() {
             result.configs.map((cfg: any, idx: number) => (
               <div key={idx} className="mb-8">
                 <h2 className="text-xl font-semibold">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
-                <h3 className='text-l font-semibold'>Violations: {cfg.violations}</h3>
+                <h3 className='text-m font-semibold'>Violations: {cfg.violations}</h3>
                 {cfg.assignments_by_dance ? (
                   <div>
                     <h3 className="text-lg font-medium mt-2">Assignments by Dance</h3>
                     <div className="bg-gray-100 p-4 rounded text-left mt-2 ">
                       {Object.keys(cfg.assignments_by_dance).sort().map((dance) => (
                         <div key={dance} className="mb-2">
-                          <strong>{dance}</strong>
-                          <ul className="list-disc ml-4">
+                          <strong className='text-m'>{dance}</strong>
+                          <div/>
+                          <div className="m-auto w-[50%] pink">
                             {cfg.assignments_by_dance[dance].map((d: string) => (
-                              <li className="text-left " key={d}>{d}</li>
+                              <div className="text-left " key={d}>{d}</div>
                             ))}
-                          </ul>
+                          </div>
                         </div>
                       ))}
                     </div>
                   </div>
                 ) : (
-                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(cfg.assignments, null, 2)}</pre>
+                  <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-screen">{JSON.stringify(cfg.assignments, null, 2)}</pre>
                 )}
 
                 <h3 className="text-lg font-medium mt-4">Report</h3>
-                <pre className="bg-black text-white p-4 rounded text-left mt-2 w-[100vw] whitespace-pre-wrap">{cfg.report_text}</pre>
-              </div>
+                {/*<pre className="bg-black text-white p-4 rounded text-left mt-2 w-[100vw] whitespace-pre-wrap">{cfg.report_text}</pre>*/}              </div>
             ))
           ) : result.satisfaction ? (
             // single-result object with satisfaction
             <div>
               <h2 className="text-xl font-semibold">Satisfaction Score: {result.satisfaction}</h2>
-              <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(result.assignments, null, 2)}</pre>
+              <pre className="bg-gray-100 p-4 rounded text-left mt-2 w-screen">{JSON.stringify(result.assignments, null, 2)}</pre>
               <h3 className="text-lg font-medium mt-4">Report</h3>
-              <pre className="bg-black text-white p-4 rounded text-left mt-2 w-[100vw] whitespace-pre-wrap">{result.report_text}</pre>
+              <pre className="bg-black text-white p-4 rounded text-left mt-2 w-screen whitespace-pre-wrap">{result.report_text}</pre>
             </div>
           ) : (
             // fallback: show raw response

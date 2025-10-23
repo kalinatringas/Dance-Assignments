@@ -170,10 +170,10 @@ class DanceScheduler:
             if not any(self._configs_equal(config, c) for c in configs):
                 configs.append(config)
             attempts += 1
-        configs.sort(key=lambda c: self._calculate_satisfaction(c), reverse=True) #list by best configurations
+        configs.sort(key=lambda c: self._calculate_satisfaction(c), reverse = True) #list by best configurations
 
         return configs
-    def _return_violations(self, config: Dict[str, List[str]], config_num: int =None) -> str :
+    def _return_violations(self, config: Dict[str, List[str]], config_num: int = None) -> str :
         violations = ''
         for dancer, dances in config.items():
             desired = self.dancers[dances]["desired count"]
