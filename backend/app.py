@@ -67,7 +67,7 @@ async def generate_configs(
             print("Creating scheduler...")
             scheduler = DanceScheduler.from_csv(dancers_path, dances_path)
             print("Generating configurations...")
-            configs = scheduler.generate_configurations(n=5)
+            configs = scheduler.generate_configurations(n=10)
             print(f"Generated {len(configs)} configurations")
 
         if not configs:

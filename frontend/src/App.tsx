@@ -63,7 +63,7 @@ function App() {
     
     <div className="min-w-[90%] max-w-screen text-black/80 p-10 text-center"> 
       <h1 className="text-2xl font-bold m-auto justify-around pb-3 mb-0.5 font-motley">Dance Scheduler</h1>
-      
+      <h3 className = "font-sans mb-1 ">Gone are the days of playing the impossible balancing game when placing dancers into dances!</h3>
       <div className='grid grid-cols-2 gap-4 mx-auto mb-8 max-w-4xl'>
         <UploadSection
           title= 'Dance Choices'
@@ -71,14 +71,14 @@ function App() {
           file = {dancersFile}
           onFileChange={setDancersFile}
           color='blue'
-          icon = '💃'
+          icon = '😈'
         />
         <UploadSection
           title = 'Dances'
           description='Upload a csv of the dances, and their spots'
           file = {dancesFile}
           onFileChange={setDancesFile}
-          color = 'purple'
+          color = 'blue'
           icon = '😼'
         />
       </div>
