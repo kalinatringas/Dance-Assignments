@@ -37,20 +37,31 @@ class DanceScheduler:
         data.columns = data.columns.str.strip()
 
         # Detect which columns are dance choices (e.g., "one", "two", "three", etc.)
-        choice_columns = [col for col in data.columns if col.lower().startswith("choice") or col.lower() in {"one", "two", "three", "four", "five"}]
-
+        choice_columns = [
+            col for col in data.columns
+            if any(keyword in col.lower() for keyword in ["choice"])
+            or col.lower() in {"one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten"}
+        ]
     # data = pd.read_csv("input.csv", usecols=columns_to_keep)
+        how_many_col = next(
+        (col for col in data.columns if col.strip().lower().startswith("how many")),
+        None
+        )
+        if how_many_col is None:
+            raise ValueError("Could not find a column starting with 'How many' in the CSV file.")
 
         dancers = {}
         for __, row in data.iterrows():
-            dancer_name = row["Name?"]
-            desired_count = int(row["How many showcase sets do you want to be in?"])
+            dancer_name = row["Name?"].strip()
+            try:
+                desired_count = int(row[how_many_col])
+            except (ValueError, TypeError):
+                desired_count = 0
 
-            ranked_choices = [row[col] for col in choice_columns if pd.notna(row[col])]
-            
-            # print(f"\nDancer: {dancer_name}")
-            # print(f"Desired count: {desired_count}")
-            # print(f"Ranked choices: {ranked_choices}")
+            ranked_choices = [row[col] for col in choice_columns if pd.notna(row[col])]            
+            print(f"\nDancer: {dancer_name}")
+            print(f"Desired count: {desired_count}")
+            print(f"Ranked choices: {ranked_choices}")
 
             dancers[dancer_name]= {
                 "desired count": desired_count,
@@ -173,7 +184,7 @@ class DanceScheduler:
         configs.sort(key=lambda c: self._calculate_satisfaction(c), reverse = True) #list by best configurations
 
         return configs
-    def _return_violations(self, config: Dict[str, List[str]], config_num: int = None) -> str :
+    def _return_violations(self, config: dict[str, List[str]], config_num: int = None) -> str :
         violations = ''
         for dancer, dances in config.items():
             desired = self.dancers[dancer]["desired count"]
@@ -361,11 +372,12 @@ class DanceScheduler:
 
 
 if __name__ == "__main__":
-    dancers = 'dances.csv'
+    dancers = 'backend/dancers[1].csv'
+    dances = 'backend/dances[2].csv'
 
-    scheduler = DanceScheduler.from_csv('input.csv', 'dances.csv')
-    configs = scheduler.generate_configurations(n=5)
-    violations = scheduler._return_violations(configs)
+    scheduler = DanceScheduler.from_csv(dancers, dances)
+    configs = scheduler.generate_configurations(n=1)
+    violations = scheduler._return_violations(configs[0])
 
     for i, config in enumerate(configs, 1):
         scheduler.print_configuration(config, config_num=i)
