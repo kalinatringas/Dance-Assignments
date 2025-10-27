@@ -37,14 +37,16 @@ class DanceScheduler:
         data.columns = data.columns.str.strip()
 
         # Detect which columns are dance choices (e.g., "one", "two", "three", etc.)
+        # oh whell this isn't scalable
         choice_columns = [col for col in data.columns if col.lower().startswith("choice") or col.lower() in {"one", "two", "three", "four", "five"}]
-
-    # data = pd.read_csv("input.csv", usecols=columns_to_keep)
-
+        desiredCount  = [col for col in data.columns if col.lower().startswith("How many")] 
+        # data = pd.read_csv("input.csv", usecols=columns_to_keep)
+   
         dancers = {}
         for __, row in data.iterrows():
             dancer_name = row["Name?"]
-            desired_count = int(row["How many showcase sets do you want to be in?"])
+            
+            desired_count = int(row[col] for col in desiredCount if pd.notna(row[col]))  # returning an error, key error
 
             ranked_choices = [row[col] for col in choice_columns if pd.notna(row[col])]
             
@@ -56,6 +58,7 @@ class DanceScheduler:
                 "desired count": desired_count,
                 "ranked choices": ranked_choices
             }
+        print(data.head())
         cap = pd.read_csv(capacities_file)
         cap.columns = cap.columns.str.strip()  # Remove any whitespace from column names
         capacities = {}
@@ -361,9 +364,10 @@ class DanceScheduler:
 
 
 if __name__ == "__main__":
-    dancers = 'dances.csv'
+    dancers = 'backend/dancers[1].csv'
+    dances = 'backend/dances[2].csv'
 
-    scheduler = DanceScheduler.from_csv('input.csv', 'dances.csv')
+    scheduler = DanceScheduler.from_csv(dancers, dances)
     configs = scheduler.generate_configurations(n=5)
     violations = scheduler._return_violations(configs)
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { UploadSection } from './ui/UploadSection';
 import axios from 'axios'
-import { Card, CardContent } from "@/components/ui/card"
+import { Card} from "@/components/ui/card"
 import {
   Carousel,
   CarouselContent,
@@ -93,21 +93,25 @@ function App() {
       {result && (
         <div className="mt-6 text-left">
           {/* If multiple configs are returned, render each one */}
-          <Carousel>
-          <CarouselContent>
+        <Carousel
+        opts={{
+        align: "start",
+        }}
+        
+        >
+        <CarouselContent >
           {result.configs && result.configs.length > 0 ? (
             result.configs.map((cfg: any, idx: number) => (
-              <CarouselItem key={idx} className="mb-8 m-auto text-center w-full">
-                <Card>
-                <h2 className="text-xl font-semibold">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
-                <h3 className='text-m font-semibold'>Violations: {cfg.violations}</h3>                
+              <CarouselItem key={idx} className="mb-0 m-auto text-center w-full">
+                <Card className='bg-purple-200/20 border-white/20'>
+                <h2 className="text-xl font-semibold mb-0">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
+                <h3 className='text-m font-semibold m-6 mt-0 mb-0'>Violations: {cfg.violations}</h3>                
                 {cfg.assignments_by_dance ? (
                   <div>
-                    <h3 className="text-lg font-medium mt-2 m-auto">Assignments by Dance</h3>
+                    <h3 className="text-lg font-medium mt-0 m-auto">Assignments by Dance</h3>
                     <div className='grid grid-flow-col'>
                       {Object.keys(cfg.assignments_by_dance).sort().map((dance) => (
                         <div key={dance} className="m-auto text-center bg-purple-100/80 p-4 rounded-xl max-w-fit mt-2">
-                       
                           <strong className='text-m'>{dance}</strong>
                           <div>---------------</div>
                           <div/>
@@ -141,6 +145,8 @@ function App() {
            // <pre className="bg-red-100 p-4 rounded text-left mt-2 w-[100vw]">{JSON.stringify(result, null, 2)}</pre>
           )}
           </CarouselContent>   
+          <CarouselPrevious className='bg-purple-200'/>
+          <CarouselNext className='bg-purple-400'/>
           </Carousel>
         </div>
       )}
