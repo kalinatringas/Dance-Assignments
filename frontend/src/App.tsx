@@ -105,7 +105,8 @@ function App() {
               <CarouselItem key={idx} className="mb-0 m-auto text-center w-full">
                 <Card className='bg-purple-200/20 border-white/20'>
                 <h2 className="text-xl font-semibold mb-0">Configuration {idx + 1} - Satisfaction Score: {cfg.satisfaction}</h2>
-                <h3 className='text-m font-semibold m-6 mt-0 mb-0'>Violations: {cfg.violations}</h3>                
+                <h3 className='text-m font-semibold m-6 mt-0 mb-0'>Violations: {cfg.violations}</h3> 
+                <h3 className= 'text-m font-semibold m-6 mt-0 mb-0'>Overlap: {cfg.overlap}</h3>               
                 {cfg.assignments_by_dance ? (
                   <div>
                     <h3 className="text-lg font-medium mt-0 m-auto">Assignments by Dance</h3>

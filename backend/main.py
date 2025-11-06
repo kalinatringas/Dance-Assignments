@@ -3,6 +3,7 @@ import csv
 import io
 import sys
 from contextlib import redirect_stdout
+from itertools import combinations
 import pandas as pd
 from typing import List, Dict
 from collections import defaultdict
@@ -172,7 +173,57 @@ class DanceScheduler:
                         break
                 if not assigned:
                     break
+        
         return dict(assignments)
+        '''
+        assignmnets = { 
+            'name': ['dance', 'dance', 'dance']
+        }
+        '''
+    
+    def overlap(self, assignments: Dict[str, List[str]])-> str:
+        # look through the different assignmnets, see where there is overlap
+        # how should i check? 
+        '''
+            Dict[str,set[str]] <- so that I can do set operations
+            check = [
+                {   
+                Splatoon: [name, name, name name],
+                DTI: [name, name, name, name]
+                }
+            ]
+        '''
+        dance_to_dancers = defaultdict(set)
+        for dancer, dances in assignments.items():
+            for dance in dances:
+                dance_to_dancers[dance].add(dancer)
+        all_dances = list(dance_to_dancers.keys())
+        overlaps = []
+        no_overlaps = []
+    
+        for dance1, dance2 in combinations(all_dances, 2):
+            dancers1 = dance_to_dancers[dance1]
+            dancers2 = dance_to_dancers[dance2]
+            if dancers1 & dancers2: # the intercetion isn't empty
+                overlaps.append((dance1, dance2, dancers1 & dancers2))
+            else:
+                no_overlaps.append((dance1, dance2))
+        
+        output = []
+       
+        # if overlaps:
+        #     output.append("💃 Overlapping Dances:")
+        #     for d1, d2, shared in overlaps:
+        #         shared_names = ", ".join(sorted(shared))
+        #         output.append(f" - {d1} & {d2} share: {shared_names} \n")
+        # else:
+        #     output.append("No overlaps found between any dances.")
+        if no_overlaps:
+            for d1, d2 in no_overlaps:
+                output.append(f"{d1} and {d2} have no overlaps \n")
+        return '\n'.join(output)
+
+
     def generate_configurations(self, n:int=5 ) -> List[Dict[str, List[str]]]:
         configs = []
         attempts = 0

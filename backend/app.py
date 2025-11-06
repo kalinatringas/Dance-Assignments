@@ -67,7 +67,7 @@ async def generate_configs(
             print("Creating scheduler...")
             scheduler = DanceScheduler.from_csv(dancers_path, dances_path)
             print("Generating configurations...")
-            configs = scheduler.generate_configurations(n=5)
+            configs = scheduler.generate_configurations(n=10)
             print(f"Generated {len(configs)} configurations")
 
         if not configs:
@@ -86,7 +86,7 @@ async def generate_configs(
                 report_text = scheduler.configuration_report(cfg, config_num=i)
             except Exception:
                 report_text = "(Failed to generate report_text)\n" + traceback.format_exc()
-
+            overlap = scheduler.overlap(cfg)
             # Build dance -> [dancers] mapping for easier display on frontend
             dance_map = {}
             from collections import defaultdict as _dd
@@ -103,7 +103,8 @@ async def generate_configs(
                 "assignments": cfg,  # dancer -> [dances], kept for compatibility
                 "assignments_by_dance": dict(tmp),
                 "violations" : violations,
-                "report_text": report_text
+                "report_text": report_text,
+                "overlap": overlap
             })
 
         # Sort and return results by satisfaction (best first)
