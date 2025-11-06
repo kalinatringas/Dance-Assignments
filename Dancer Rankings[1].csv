@@ -1,15 +1,3 @@
-﻿# Dance-Assignments
-
-checkout the official deployment [here!](https://danceassignment.netlify.app)
-
-run frontend with:
-npm run dev
-
-run backend with:
-uvicorn backend.app:app --reload
-
-#Dancer Rankings example CSV File
----
 "Name","How many dances","one","two","three","four","five"
 "Amanda","3","Splatoon","Episode","DTI","",""
 "Jacob","2","DTI","Splatoon","","",""
@@ -31,16 +19,3 @@ uvicorn backend.app:app --reload
 "Lily","2","Episode","DTI","","",""
 "Noah","3","Splatoon","Subway Surfers","Nintendo/Zelda","",""
 "Zoe","2","DTI","Episode","","",""
-
-
-
-#Dance List example CSV File
----
->"Dance Name","Dancer Count"
-"Splatoon","10"
-"Episode","10"
-"DTI","20"
-"Nintendo/Zelda","7"
-"Subway Surfers","15"
-
-

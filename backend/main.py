@@ -428,7 +428,7 @@ if __name__ == "__main__":
     dances = 'backend/dances[2].csv'
 
     scheduler = DanceScheduler.from_csv(dancers, dances)
-    configs = scheduler.generate_configurations(n=1)
+    configs = scheduler.generate_configurations(n=5)
     violations = scheduler._return_violations(configs[0])
 
     for i, config in enumerate(configs, 1):
