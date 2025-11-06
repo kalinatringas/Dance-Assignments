@@ -32,7 +32,7 @@ function App() {
 
       setLoading(true);
       try{
-        const url = "https://dance-assignments.onrender.com";
+        const url = "https://dance-assignments.onrender.com/generate";
         console.log("Posting to", url);
         const res = await axios.post(url, formData);
         let payload = res.data;
